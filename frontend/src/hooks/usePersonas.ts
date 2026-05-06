@@ -32,6 +32,7 @@ export function usePersonas() {
     }
   }, [isDataLoaded]);
 
+
   const personasFiltered = useMemo(() => {
     return personas.filter((p) => {
       if (!search) return personas;
