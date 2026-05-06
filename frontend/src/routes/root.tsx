@@ -7,9 +7,9 @@ import { LoginForm } from '@/app/Login';
 import { Suspense } from 'react';
 
 export const Root = () => {
-  const { user } = useAuth();
+  const { user, isAuthenticated } = useAuth();
 
-  if (!user) {
+  if (!user && !isAuthenticated) {
     return <Suspense fallback={<div>Loading...</div>}><LoginForm /></Suspense>
   }
 
