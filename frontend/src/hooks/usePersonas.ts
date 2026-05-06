@@ -20,7 +20,7 @@ export function usePersonas() {
       setError(null);
       axios.get(`${URL_API}/personas`)
         .then((response) => {
-          setPersonas(response.data);
+          setPersonas(Array.isArray(response.data) ? response.data : []);
           setIsDataLoaded(true);
         })
         .catch(error => {
@@ -34,8 +34,10 @@ export function usePersonas() {
 
 
   const personasFiltered = useMemo(() => {
-    return personas.filter((p) => {
-      if (!search) return personas;
+    const source = Array.isArray(personas) ? personas : [];
+
+    return source.filter((p) => {
+      if (!search) return true;
       return p.identificacion.includes(search) || p.nombres.toLowerCase().includes(search.toLowerCase()) || p.apellidos.toLowerCase().includes(search.toLowerCase());
     });
   }, [personas, search]);
