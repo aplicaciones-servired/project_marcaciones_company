@@ -8,6 +8,7 @@ import { Label } from '@/components/ui/label';
 import { useToast } from '@/hooks/use-toast';
 import { FormEvent, useState } from "react";
 import { cn } from '@/lib/utils';
+import { useNavigate } from 'react-router-dom';
 import axios from "axios";
 
 export function LoginForm({ className, ...props }: React.ComponentPropsWithoutRef<'div'>) {
@@ -15,6 +16,7 @@ export function LoginForm({ className, ...props }: React.ComponentPropsWithoutRe
   const [password, setPassword] = useState('')
   const [loading, setLoading] = useState(false)
   const { setIsAuthenticated, fetchUser } = useAuth()
+  const navigate = useNavigate()
   const { toast } = useToast()
 
   const handleSubmit = async (ev: FormEvent) => {
@@ -29,6 +31,7 @@ export function LoginForm({ className, ...props }: React.ComponentPropsWithoutRe
         // Obtener el perfil del usuario
         await fetchUser()
         setIsAuthenticated(true)
+        navigate('/')
       }
     } catch (error: unknown) {
       console.log(error)
