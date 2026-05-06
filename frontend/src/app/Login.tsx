@@ -27,11 +27,9 @@ export function LoginForm({ className, ...props }: React.ComponentPropsWithoutRe
       const res = await axios.post(`${URL_API_LOGIN}/login`, { username, password })
       
       if (res.status === 200) {
-
-        // Obtener el perfil del usuario
-        await fetchUser()
         setIsAuthenticated(true)
         navigate('/')
+        void fetchUser()
       }
     } catch (error: unknown) {
       console.log(error)
