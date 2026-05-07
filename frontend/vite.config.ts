@@ -17,13 +17,6 @@ export default defineConfig({
         changeOrigin: true,
         secure: false,
       },
-      '/api_login': {
-        target: 'http://localhost:9010',
-        changeOrigin: true,
-        secure: false,
-        rewrite: (path) => path.replace(/^\/api_login/, '/api/v2'),
-      },
     },
   },
 })
-
