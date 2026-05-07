@@ -22,13 +22,21 @@ import {
   useSidebar,
 } from '@/components/ui/sidebar'
 import { useAuth } from '@/context/AuthProvider'
+import { useNavigate } from 'react-router-dom'
 
 export function NavUser() {
   const { isMobile } = useSidebar()
   const { user, logout } = useAuth()
+  const navigate = useNavigate()
+
+  const initials = `${user?.names?.[0] ?? ''}${user?.lastnames?.[0] ?? user?.username?.[0] ?? ''}`.trim() || 'U'
+  const displayName = [user?.names || user?.username, user?.lastnames].filter(Boolean).join(' ') || 'Usuario'
+  const displaySubtitle = user?.email || user?.process || 'Sin perfil'
 
   const logOut = async () => {
     await logout()
+    // Redirigir a login después de limpiar el estado
+    navigate('/login', { replace: true })
   }
 
   return (
@@ -41,11 +49,11 @@ export function NavUser() {
               className='data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground'
             >
               <Avatar className='h-8 w-8 rounded-lg'>
-                <AvatarFallback className='rounded-lg'>{user?.names?.[0]}{user?.lastnames?.[0]}</AvatarFallback>
+                <AvatarFallback className='rounded-lg'>{initials}</AvatarFallback>
               </Avatar>
               <div className='grid flex-1 text-left text-sm leading-tight'>
-                <span className='truncate font-semibold'>{user?.names} {user?.lastnames}</span>
-                <span className='truncate text-xs'>{user?.email}</span>
+                <span className='truncate font-semibold'>{displayName}</span>
+                <span className='truncate text-xs'>{displaySubtitle}</span>
               </div>
               <ChevronsUpDown className='ml-auto size-4' />
             </SidebarMenuButton>
@@ -59,11 +67,11 @@ export function NavUser() {
             <DropdownMenuLabel className='p-0 font-normal'>
               <div className='flex items-center gap-2 px-1 py-1.5 text-left text-sm'>
                 <Avatar className='h-8 w-8 rounded-lg'>
-                  <AvatarFallback className='rounded-lg'>{user?.names?.[0]}{user?.lastnames?.[0]}</AvatarFallback>
+                  <AvatarFallback className='rounded-lg'>{initials}</AvatarFallback>
                 </Avatar>
                 <div className='grid flex-1 text-left text-sm leading-tight'>
-                  <span className='truncate font-semibold'>{user?.process}</span>
-                  <span className='truncate text-xs'>{user?.username}</span>
+                  <span className='truncate font-semibold'>{displayName}</span>
+                  <span className='truncate text-xs'>{user?.username || user?.process || 'Sin usuario'}</span>
                 </div>
               </div>
             </DropdownMenuLabel>

@@ -17,6 +17,8 @@ function Home() {
       .catch(err => console.error(err))
   }, [date])
 
+  console.log('infoMarcacion', infoMarcacion)
+
   return (
     <main className='grid grid-rows-3 grid-flow-col gap-1'>
 

@@ -14,6 +14,25 @@ interface IAuthContext {
 
 const AuthContext = createContext<IAuthContext | undefined>(undefined)
 
+const normalizeUser = (profile: unknown): User | null => {
+  if (!profile || typeof profile !== 'object') {
+    return null
+  }
+
+  const data = profile as Record<string, unknown>
+
+  return {
+    id: String(data.id ?? ''),
+    names: String(data.names ?? data.nombres ?? ''),
+    lastnames: String(data.lastnames ?? data.apellidos ?? ''),
+    username: String(data.username ?? data.usuario ?? ''),
+    email: String(data.email ?? data.correo ?? ''),
+    company: String(data.company ?? data.empresa ?? ''),
+    process: String(data.process ?? data.proceso ?? ''),
+    sub_process: String(data.sub_process ?? data.subproceso ?? ''),
+  }
+}
+
 export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const [user, setUser] = useState<User | null>(null)
   const [isAuthenticated, setIsAuthenticated] = useState(false)
@@ -21,21 +40,25 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 
   // Función para obtener el perfil del usuario
   const fetchUser = async () => {
+    // Si el usuario cerró sesión explícitamente, no revalidar
+    const hasLoggedOut = sessionStorage.getItem('hasLoggedOut')
+    if (hasLoggedOut) {
+      setIsAuthenticated(false)
+      setUser(null)
+      sessionStorage.removeItem('hasLoggedOut')
+      return
+    }
+
     try {
       const res = await axios.get(`${URL_API_LOGIN}/profile`)
       
       if (res.status === 200) {
         setIsAuthenticated(true)
-        setUser(res.data)
+        setUser(normalizeUser(res.data))
       }
-    } catch (error: unknown) {
-      if (error && typeof error === 'object' && 'response' in error) {
-        const err = error as { response?: { status?: number } }
-        if (err.response?.status === 401) {
-          setIsAuthenticated(false)
-          setUser(null)
-        }
-      }
+    } catch {
+      setIsAuthenticated(false)
+      setUser(null)
     }
   }
 
@@ -46,9 +69,13 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     } catch (error) {
       console.error('Error al cerrar sesión:', error)
     } finally {
+      // Marcar que el usuario cerró sesión explícitamente
+      sessionStorage.setItem('hasLoggedOut', 'true')
       // Limpiar el estado independientemente del resultado
       setIsAuthenticated(false)
       setUser(null)
+      // Limpiar localStorage
+      localStorage.clear()
     }
   }
 
