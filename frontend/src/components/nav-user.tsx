@@ -22,12 +22,11 @@ import {
   useSidebar,
 } from '@/components/ui/sidebar'
 import { useAuth } from '@/context/AuthProvider'
-import { useNavigate } from 'react-router-dom'
 
 export function NavUser() {
   const { isMobile } = useSidebar()
   const { user, logout } = useAuth()
-  const navigate = useNavigate()
+
 
   const initials = `${user?.names?.[0] ?? ''}${user?.lastnames?.[0] ?? user?.username?.[0] ?? ''}`.trim() || 'U'
   const displayName = [user?.names || user?.username, user?.lastnames].filter(Boolean).join(' ') || 'Usuario'

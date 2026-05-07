@@ -28,7 +28,6 @@ export function LoginForm({ className, ...props }: React.ComponentPropsWithoutRe
       
       if (res.status === 200) {
         setIsAuthenticated(true)
-        navigate('/')
         await fetchUser()
         navigate('/')
       }
@@ -109,3 +108,4 @@ export function LoginForm({ className, ...props }: React.ComponentPropsWithoutRe
     </section>
   )
 }
+
