@@ -29,7 +29,8 @@ export function LoginForm({ className, ...props }: React.ComponentPropsWithoutRe
       if (res.status === 200) {
         setIsAuthenticated(true)
         navigate('/')
-        void fetchUser()
+        await fetchUser()
+        navigate('/')
       }
     } catch (error: unknown) {
       console.log(error)

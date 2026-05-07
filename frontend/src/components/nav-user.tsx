@@ -35,8 +35,8 @@ export function NavUser() {
 
   const logOut = async () => {
     await logout()
-    // Redirigir a login después de limpiar el estado
-    navigate('/login', { replace: true })
+    // Redirigir a URL externa después de limpiar el estado
+    window.location.href = 'https://marcaciones.serviredgane.cloud/'
   }
 
   return (
