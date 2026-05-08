@@ -12,6 +12,7 @@ import { useNavigate } from 'react-router-dom';
 import axios from "axios";
 
 export function LoginForm({ className, ...props }: React.ComponentPropsWithoutRef<'div'>) {
+  const FORCE_LOGOUT_KEY = 'forceLoggedOut'
   const [username, setUsername] = useState('')
   const [password, setPassword] = useState('')
   const [loading, setLoading] = useState(false)
@@ -23,19 +24,19 @@ export function LoginForm({ className, ...props }: React.ComponentPropsWithoutRe
     ev.preventDefault();
     setLoading(true)
 
+    // El usuario decidió iniciar sesión de nuevo manualmente
+    try { localStorage.removeItem(FORCE_LOGOUT_KEY) } catch { void 0 }
+
     try {
       const res = await axios.post(`${URL_API_LOGIN}/login`, { username, password })
       
       if (res.status === 200) {
         setIsAuthenticated(true)
         await fetchUser()
-        window.location.reload()
         navigate('/')
       }
-      window.location.reload()
     } catch (error: unknown) {
       console.log(error)
-      window.location.reload()
       const err = error as { message?: string; response?: { status?: number; data?: { message?: string; description?: string } } }
       
       if (err.message === 'Network Error') {

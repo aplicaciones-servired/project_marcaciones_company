@@ -13,6 +13,7 @@ interface IAuthContext {
 }
 
 const AuthContext = createContext<IAuthContext | undefined>(undefined)
+const FORCE_LOGOUT_KEY = 'forceLoggedOut'
 
 const normalizeUser = (profile: unknown): User | null => {
   if (!profile || typeof profile !== 'object') {
@@ -41,11 +42,10 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   // Función para obtener el perfil del usuario
   const fetchUser = async () => {
     // Si el usuario cerró sesión explícitamente, no revalidar
-    const hasLoggedOut = sessionStorage.getItem('hasLoggedOut')
-    if (hasLoggedOut) {
+    const hasLoggedOut = localStorage.getItem(FORCE_LOGOUT_KEY)
+    if (hasLoggedOut === 'true') {
       setIsAuthenticated(false)
       setUser(null)
-      sessionStorage.removeItem('hasLoggedOut')
       return
     }
 
@@ -74,12 +74,12 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       console.error('Error al cerrar sesión (backend):', error)
     } finally {
       // Marcar que el usuario cerró sesión explícitamente
-      try { sessionStorage.setItem('hasLoggedOut', 'true') } catch { void 0 }
+      try { localStorage.setItem(FORCE_LOGOUT_KEY, 'true') } catch { void 0 }
       // Limpiar el estado independientemente del resultado
       setIsAuthenticated(false)
       setUser(null)
-      // Limpiar localStorage
-      try { localStorage.clear() } catch { void 0 }
+      // Limpiar datos de sesión locales (sin borrar la marca de logout)
+      try { sessionStorage.clear() } catch { void 0 }
       // Intento de eliminación de cookies accesibles desde JS (no eliminará HttpOnly)
       try {
         document.cookie.split(';').forEach(function(c) {
