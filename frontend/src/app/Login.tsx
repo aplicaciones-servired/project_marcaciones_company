@@ -20,6 +20,8 @@ export function LoginForm({ className, ...props }: React.ComponentPropsWithoutRe
   const navigate = useNavigate()
   const { toast } = useToast()
 
+  console.log('first', URL_API_LOGIN)
+
   const handleSubmit = async (ev: FormEvent) => {
     ev.preventDefault();
     setLoading(true)
