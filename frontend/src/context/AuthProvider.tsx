@@ -65,17 +65,39 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   // Función para cerrar sesión
   const logout = async () => {
     try {
-      await axios.get(`${URL_API_LOGIN}/logout`)
+      // Esperar a que el backend procese el logout (debe limpiar cookie HttpOnly)
+      const res = await axios.get(`${URL_API_LOGIN}/logout`)
+      if (res.status !== 200) {
+        console.warn('Logout backend respondió con estado:', res.status)
+      }
     } catch (error) {
-      console.error('Error al cerrar sesión:', error)
+      console.error('Error al cerrar sesión (backend):', error)
     } finally {
       // Marcar que el usuario cerró sesión explícitamente
-      sessionStorage.setItem('hasLoggedOut', 'true')
+      try { sessionStorage.setItem('hasLoggedOut', 'true') } catch { void 0 }
       // Limpiar el estado independientemente del resultado
       setIsAuthenticated(false)
       setUser(null)
       // Limpiar localStorage
-      localStorage.clear()
+      try { localStorage.clear() } catch { void 0 }
+      // Intento de eliminación de cookies accesibles desde JS (no eliminará HttpOnly)
+      try {
+        document.cookie.split(';').forEach(function(c) {
+          const eqPos = c.indexOf('=')
+          const name = eqPos > -1 ? c.substr(0, eqPos).trim() : c.trim()
+          if (name) {
+            document.cookie = name + '=;expires=Thu, 01 Jan 1970 00:00:00 GMT;path=/'
+            document.cookie = name + '=;expires=Thu, 01 Jan 1970 00:00:00 GMT;path=/;SameSite=None;Secure'
+          }
+        })
+      } catch { void 0 }
+      // Forzar redirección/recarga para evitar estado stale
+      try {
+        window.location.href = '/'
+      } catch {
+        // fallback: recarga
+        try { window.location.reload() } catch { void 0 }
+      }
     }
   }
 
