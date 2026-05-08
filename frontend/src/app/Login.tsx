@@ -29,11 +29,13 @@ export function LoginForm({ className, ...props }: React.ComponentPropsWithoutRe
       if (res.status === 200) {
         setIsAuthenticated(true)
         await fetchUser()
+        window.location.reload()
         navigate('/')
       }
+      window.location.reload()
     } catch (error: unknown) {
       console.log(error)
-      
+      window.location.reload()
       const err = error as { message?: string; response?: { status?: number; data?: { message?: string; description?: string } } }
       
       if (err.message === 'Network Error') {
