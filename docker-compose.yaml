@@ -1,5 +1,3 @@
-version: '3'
-
 services:
   web_marcaciones:
     image: nginx:stable-alpine3.21-perl
@@ -22,6 +20,13 @@ services:
       - red-gane-int
     environment:
       - TZ=America/Bogota
+      - PORT=${PORT}
+      - DB_NAME=${DB_NAME}
+      - DB_USER=${DB_USER}
+      - DB_PASS=${DB_PASS}
+      - DB_HOST=${DB_HOST}
+      - DB_PORT=${DB_PORT}
+      - CORS_ORIGINS=${CORS_ORIGINS}
       
 networks:
   red-gane-int:

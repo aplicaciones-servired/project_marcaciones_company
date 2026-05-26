@@ -1,3 +1,33 @@
+def parseEnvFileContent(String content) {
+  def envVars = [:]
+
+  content.readLines().each { rawLine ->
+    def line = rawLine.trim()
+
+    if (!line || line.startsWith('#')) {
+      return
+    }
+
+    if (line.startsWith('export ')) {
+      line = line.substring(7).trim()
+    }
+
+    def separatorIndex = line.indexOf('=')
+    if (separatorIndex < 1) {
+      return
+    }
+
+    def key = line.substring(0, separatorIndex).trim()
+    def value = line.substring(separatorIndex + 1)
+    envVars[key] = value
+  }
+
+  return envVars
+}
+
+def frontendEnv = [:]
+def backendEnv = [:]
+
 pipeline {
   agent any
     
@@ -9,17 +39,15 @@ pipeline {
   }
     
   stages {
-    stage('Copy .env files') {
+    stage('Load env vars') {
       steps {
         script {
-          def env_client = readFile(ENV_MARCACION_CLIENT)
-          def env_api = readFile(ENV_MARCACION_API)
-          writeFile file: './frontend/.env', text: env_client
-          writeFile file: './server/.env', text: env_api
+          frontendEnv = parseEnvFileContent(readFile(ENV_MARCACION_CLIENT))
+          backendEnv = parseEnvFileContent(readFile(ENV_MARCACION_API))
         }
       }
     }
-    
+
     stage('Install dependencies') {
       steps {
         script {
@@ -33,8 +61,10 @@ pipeline {
     stage('Build client') {
       steps {
         script {
-          dir('frontend') {
-            sh 'pnpm build'
+          withEnv(frontendEnv.collect { key, value -> "${key}=${value}" }) {
+            dir('frontend') {
+              sh 'pnpm build'
+            }
           }
         }
       }
@@ -62,8 +92,12 @@ pipeline {
 
     stage('run docker compose'){
         steps {
-          script { sh 'docker compose up -d' }
+          script {
+            withEnv(backendEnv.collect { key, value -> "${key}=${value}" }) {
+              sh 'docker compose up -d'
+            }
           }
+        }
       }
     }
 }

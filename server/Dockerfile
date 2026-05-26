@@ -6,8 +6,8 @@ COPY . .
 
 RUN npm install -g pnpm@latest
 
-RUN pnpm install && pnpm run build
+RUN pnpm install --ignore-scripts && pnpm run build
 
 EXPOSE 4020
 
-CMD ["npm", "start"]
+CMD ["node", "dist/index.js"]
