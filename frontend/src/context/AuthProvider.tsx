@@ -15,24 +15,6 @@ interface IAuthContext {
 const AuthContext = createContext<IAuthContext | undefined>(undefined)
 const FORCE_LOGOUT_KEY = 'forceLoggedOut'
 
-const normalizeUser = (profile: unknown): User | null => {
-  if (!profile || typeof profile !== 'object') {
-    return null
-  }
-
-  const data = profile as Record<string, unknown>
-
-  return {
-    id: String(data.id ?? ''),
-    names: String(data.names ?? data.nombres ?? ''),
-    lastnames: String(data.lastnames ?? data.apellidos ?? ''),
-    username: String(data.username ?? data.usuario ?? ''),
-    email: String(data.email ?? data.correo ?? ''),
-    company: String(data.company ?? data.empresa ?? ''),
-    process: String(data.process ?? data.proceso ?? ''),
-    sub_process: String(data.sub_process ?? data.subproceso ?? ''),
-  }
-}
 
 export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const [user, setUser] = useState<User | null>(null)
@@ -49,16 +31,6 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       return
     }
 
-    try {
-      const res = await axios.get(`${URL_API_LOGIN}/profile`)
-      if (res.status === 200) {
-        setIsAuthenticated(true)
-        setUser(normalizeUser(res.data))
-      }
-    } catch {
-      setIsAuthenticated(false)
-      setUser(null)
-    }
   }
 
   // Función para cerrar sesión
