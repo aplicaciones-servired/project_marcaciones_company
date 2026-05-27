@@ -51,7 +51,6 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 
     try {
       const res = await axios.get(`${URL_API_LOGIN}/profile`)
-      
       if (res.status === 200) {
         setIsAuthenticated(true)
         setUser(normalizeUser(res.data))
