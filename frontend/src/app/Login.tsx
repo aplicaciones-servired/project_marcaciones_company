@@ -36,7 +36,7 @@ export function LoginForm({ className, ...props }: React.ComponentPropsWithoutRe
         setIsAuthenticated(true)
         await fetchUser()
         navigate('/')
-        window.location.reload() // Recargar para limpiar cualquier estado residual
+        //window.location.reload() // Recargar para limpiar cualquier estado residual
       }
     } catch (error: unknown) {
       console.log(error)
