@@ -18,6 +18,8 @@ services:
     container_name: api-marcaciones
     restart: always
     image: api-marca-v1.0
+    env_file:
+      - ./server/.env
     networks:
       - red-gane-int
     environment:
